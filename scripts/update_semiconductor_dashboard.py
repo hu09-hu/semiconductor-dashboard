@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import datetime as dt
+import calendar
 import html
 import json
 import re
@@ -64,13 +65,15 @@ def month_starts(end_date, months=5):
     year = end_date.year
     month = end_date.month
     out = []
+    reference_day = end_date.day
     for offset in range(months - 1, -1, -1):
         m = month - offset
         y = year
         while m <= 0:
             y -= 1
             m += 12
-        out.append(f"{y:04d}{m:02d}01")
+        day = min(reference_day, calendar.monthrange(y, m)[1])
+        out.append(f"{y:04d}{m:02d}{day:02d}")
     return out
 
 
@@ -132,31 +135,45 @@ def read_prices(end_ad):
 def read_institutions(dates):
     institutions = {stock: {} for stock in STOCKS}
     for date in dates:
-        data = fetch(
-            f"https://www.twse.com.tw/rwd/zh/fund/T86"
-            f"?date={date}&selectType=ALLBUT0999&response=json"
-        )
-        for row in data.get("data", []):
-            if row[0] in LISTED:
-                institutions[row[0]][date] = {
-                    "foreign": intnum(row[4]) + intnum(row[7]),
-                    "trust": intnum(row[10]),
-                    "dealer": intnum(row[11]),
-                    "total": intnum(row[-1]),
-                }
+        complete = False
+        for attempt in range(4):
+            daily = {}
+            data = fetch(
+                f"https://www.twse.com.tw/rwd/zh/fund/T86"
+                f"?date={date}&selectType=ALLBUT0999&response=json"
+            )
+            for row in data.get("data", []):
+                if row[0] in LISTED:
+                    daily[row[0]] = {
+                        "foreign": intnum(row[4]) + intnum(row[7]),
+                        "trust": intnum(row[10]),
+                        "dealer": intnum(row[11]),
+                        "total": intnum(row[-1]),
+                    }
 
-        otc_data = fetch(
-            f"https://www.tpex.org.tw/www/zh-tw/insti/dailyTrade"
-            f"?date={ad_to_slash(date)}&type=Daily&response=json"
-        )
-        for row in otc_data.get("tables", [{}])[0].get("data", []):
-            if row[0] in OTC:
-                institutions[row[0]][date] = {
-                    "foreign": intnum(row[10]),
-                    "trust": intnum(row[13]),
-                    "dealer": intnum(row[22]),
-                    "total": intnum(row[-1]),
-                }
+            otc_data = fetch(
+                f"https://www.tpex.org.tw/www/zh-tw/insti/dailyTrade"
+                f"?date={ad_to_slash(date)}&type=Daily&response=json"
+            )
+            for row in otc_data.get("tables", [{}])[0].get("data", []):
+                if row[0] in OTC:
+                    daily[row[0]] = {
+                        "foreign": intnum(row[10]),
+                        "trust": intnum(row[13]),
+                        "dealer": intnum(row[22]),
+                        "total": intnum(row[-1]),
+                    }
+
+            if set(STOCKS).issubset(daily):
+                for stock, values in daily.items():
+                    institutions[stock][date] = values
+                complete = True
+                break
+            time.sleep(2 + attempt)
+
+        if not complete:
+            missing = sorted(stock for stock in STOCKS if date not in institutions[stock])
+            raise RuntimeError(f"Incomplete institutional data for {date}: {missing}")
     return institutions
 
 
