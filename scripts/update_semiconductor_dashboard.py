@@ -5,6 +5,7 @@ import json
 import re
 import ssl
 import sys
+import time
 from pathlib import Path
 from urllib.request import Request, urlopen
 
@@ -24,8 +25,15 @@ NAMES = {
 def fetch(url):
     request = Request(url, headers={"User-Agent": "Mozilla/5.0"})
     context = ssl._create_unverified_context()
-    with urlopen(request, timeout=25, context=context) as res:
-        return json.loads(res.read().decode("utf-8"))
+    last_error = None
+    for attempt in range(4):
+        try:
+            with urlopen(request, timeout=60, context=context) as res:
+                return json.loads(res.read().decode("utf-8"))
+        except Exception as exc:
+            last_error = exc
+            time.sleep(2 + attempt * 3)
+    raise last_error
 
 
 def num(value):
@@ -421,7 +429,7 @@ def build_html(latest_date, summaries, stock_metrics, daily20):
 
 
 def main():
-    today = dt.datetime.utcnow() + dt.timedelta(hours=8)
+    today = dt.datetime.now(dt.UTC) + dt.timedelta(hours=8)
     end_ad = today.strftime("%Y%m%d")
     if len(sys.argv) > 1:
         end_ad = sys.argv[1]
