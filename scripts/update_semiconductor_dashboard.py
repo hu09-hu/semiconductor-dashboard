@@ -138,18 +138,21 @@ def read_institutions(dates):
         complete = False
         for attempt in range(4):
             daily = {}
-            data = fetch(
-                f"https://www.twse.com.tw/rwd/zh/fund/T86"
-                f"?date={date}&selectType=ALLBUT0999&response=json"
-            )
-            for row in data.get("data", []):
-                if row[0] in LISTED:
-                    daily[row[0]] = {
-                        "foreign": intnum(row[4]) + intnum(row[7]),
-                        "trust": intnum(row[10]),
-                        "dealer": intnum(row[11]),
-                        "total": intnum(row[-1]),
-                    }
+            for select_type in ("ALLBUT0999", "ALL"):
+                data = fetch(
+                    f"https://www.twse.com.tw/rwd/zh/fund/T86"
+                    f"?date={date}&selectType={select_type}&response=json"
+                )
+                for row in data.get("data", []):
+                    if row[0] in LISTED:
+                        daily[row[0]] = {
+                            "foreign": intnum(row[4]) + intnum(row[7]),
+                            "trust": intnum(row[10]),
+                            "dealer": intnum(row[11]),
+                            "total": intnum(row[-1]),
+                        }
+                if set(LISTED).issubset(daily):
+                    break
 
             otc_data = fetch(
                 f"https://www.tpex.org.tw/www/zh-tw/insti/dailyTrade"
@@ -262,6 +265,10 @@ def fmt_amount(value):
     return f"{value / 100_000_000:,.0f} 億"
 
 
+def fmt_amount_short(value):
+    return f"{value / 100_000_000:,.0f}"
+
+
 def fmt_lots(value):
     sign = "+" if value > 0 else ""
     return f"{sign}{value / 1000:,.0f} 張"
@@ -334,6 +341,23 @@ def build_html(latest_date, summaries, stock_metrics, daily20):
               <td class="{css_class(metric['foreign'])}">{fmt_lots(metric['foreign'])}</td>
               <td class="{css_class(metric['trust'])}">{fmt_lots(metric['trust'])}</td>
               <td><span class="pill {kind}">{html.escape(status)}</span></td>
+            </tr>"""
+        )
+    daily_amount_rows = []
+    for row in reversed(daily20):
+        stock_amounts = row["stocks"]
+        leader = max(stock_amounts, key=stock_amounts.get)
+        daily_amount_rows.append(
+            f"""
+            <tr>
+              <td>{ad_to_label(row['date'])}</td>
+              <td>{fmt_amount_short(stock_amounts['3711'])}</td>
+              <td>{fmt_amount_short(stock_amounts['2449'])}</td>
+              <td>{fmt_amount_short(stock_amounts['6257'])}</td>
+              <td>{fmt_amount_short(stock_amounts['6239'])}</td>
+              <td>{fmt_amount_short(stock_amounts['6147'])}</td>
+              <td>{fmt_amount(row['amount'])}</td>
+              <td><span class="pill watch">{html.escape(NAMES[leader])}</span></td>
             </tr>"""
         )
     daily_points = []
@@ -432,6 +456,7 @@ def build_html(latest_date, summaries, stock_metrics, daily20):
       <div class="card"><h2>20日每日成交金額趨勢</h2><svg class="chart" viewBox="0 0 640 260"><line x1="48" y1="218" x2="612" y2="218" stroke="#dfe4d8"/><line x1="48" y1="38" x2="48" y2="218" stroke="#dfe4d8"/><polyline class="line-amount" points="{' '.join(daily_points)}"/><g fill="#0f9f9a">{"".join(f'<circle cx="{p.split(",")[0]}" cy="{p.split(",")[1]}" r="4"/>' for p in daily_points[::3])}</g><g class="axis-label"><text x="38" y="232">{ad_to_label(daily20[0]['date'])}</text><text x="300" y="232">{ad_to_label(daily20[len(daily20)//2]['date'])}</text><text x="590" y="232">{ad_to_label(daily20[-1]['date'])}</text><text x="520" y="52">高點 {fmt_amount(max_amount)}</text><text x="510" y="190">最新 {fmt_amount(daily20[-1]['amount'])}</text></g></svg></div>
       <div class="card"><h2>三週期 Rotation Score</h2><svg class="chart" viewBox="0 0 640 260"><line x1="44" y1="218" x2="612" y2="218" stroke="#bfc8bd"/><g>{''.join(f'<rect class="{klass}" x="{x}" y="{y:.0f}" width="88" height="{height:.0f}" rx="6"/>' for label, score, klass, x, y, height in score_bars)}</g><g class="axis-label">{''.join(f'<text x="{x+12}" y="238">{label}</text><text x="{x+22}" y="{y-8:.0f}">{score}</text>' for label, score, klass, x, y, height in score_bars)}</g></svg></div>
     </section>
+    <section class="card" style="margin-top:16px"><h2>每日五檔成交金額</h2><div class="table-wrap"><table><thead><tr><th>日期</th><th>日月光</th><th>京元電</th><th>矽格</th><th>力成</th><th>頎邦</th><th>五檔合計</th><th>當日最大</th></tr></thead><tbody>{''.join(daily_amount_rows)}</tbody></table></div><p class="kpi-note">單位：億元。日期由新到舊排列，用來觀察每日資金集中在哪一家公司。</p></section>
     <section class="card" style="margin-top:16px"><h2>代表股明細</h2><div class="table-wrap"><table><thead><tr><th>代號</th><th>股票</th><th>20日成交金額</th><th>期初收盤</th><th>最新收盤</th><th>20日股價變化</th><th>三大法人</th><th>外資</th><th>投信</th><th>狀態</th></tr></thead><tbody>{''.join(table_rows)}</tbody></table></div></section>
     <section class="grid notes">
       <div class="card"><div class="note-title">下一個轉強訊號</div><p class="note-body">5日 Rotation Score 升破 70、5檔單日成交金額站回 600 億、三大法人由賣轉買。</p></div>
@@ -467,9 +492,13 @@ def main():
 
     daily20 = []
     for date in window20:
-        amount = sum(next(row["amount"] for row in prices[stock] if row["date"] == date) for stock in STOCKS)
+        stock_amounts = {
+            stock: next(row["amount"] for row in prices[stock] if row["date"] == date)
+            for stock in STOCKS
+        }
+        amount = sum(stock_amounts.values())
         inst = sum(institutions[stock].get(date, {}).get("total", 0) for stock in STOCKS)
-        daily20.append({"date": date, "amount": amount, "inst": inst})
+        daily20.append({"date": date, "amount": amount, "inst": inst, "stocks": stock_amounts})
 
     root = Path(__file__).resolve().parents[1]
     output = root / "index.html"
