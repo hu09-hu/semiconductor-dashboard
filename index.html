@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>封測資金輪動儀表板｜5日/20日/60日</title>
+  <style>
+    :root {
+      --bg: #f7f8f4;
+      --panel: #ffffff;
+      --ink: #1d251f;
+      --muted: #667066;
+      --line: #dfe4d8;
+      --green: #238263;
+      --green-2: #dff3ea;
+      --red: #c94b3a;
+      --red-2: #ffe5df;
+      --amber: #c8841f;
+      --amber-2: #fff1d7;
+      --teal: #0f9f9a;
+      --shadow: 0 10px 28px rgba(38, 48, 38, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    header {
+      padding: 28px clamp(18px, 4vw, 44px) 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcf8;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 3vw, 40px);
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      padding: 8px 12px;
+      border: 1px solid #cbd8c8;
+      background: #eef7ed;
+      color: #1d6c4e;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 22px clamp(18px, 4vw, 44px) 44px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .kpis {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+      min-width: 0;
+    }
+
+    .kpi-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .kpi-note {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .positive { color: var(--green); }
+    .negative { color: var(--red); }
+    .warning { color: var(--amber); }
+
+    .layout {
+      grid-template-columns: 1.25fr 0.75fr;
+      align-items: start;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .decision {
+      display: grid;
+      grid-template-columns: 116px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .score-ring {
+      width: 116px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        conic-gradient(var(--amber) 0 65%, #eceee6 65% 100%);
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .score-ring::after {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      background: var(--panel);
+      border-radius: 50%;
+    }
+
+    .score-ring strong {
+      position: relative;
+      z-index: 1;
+      font-size: 28px;
+    }
+
+    .decision-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .decision-text {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .signal-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .signal {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #f8faf5;
+      border: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .signal span:last-child {
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .two-col {
+      grid-template-columns: 1fr 1fr;
+      margin-top: 16px;
+    }
+
+    .chart {
+      width: 100%;
+      height: 260px;
+      overflow: visible;
+    }
+
+    .axis-label {
+      fill: #6d756d;
+      font-size: 12px;
+    }
+
+    .line-amount {
+      fill: none;
+      stroke: var(--teal);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .bar-positive { fill: var(--green); }
+    .bar-negative { fill: var(--red); }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      min-width: 780px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      background: #f7f9f3;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+    }
+
+    th:first-child, td:first-child,
+    th:nth-child(2), td:nth-child(2) {
+      text-align: left;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .pill {
+      display: inline-flex;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .pill.good { color: var(--green); background: var(--green-2); }
+    .pill.bad { color: var(--red); background: var(--red-2); }
+    .pill.watch { color: var(--amber); background: var(--amber-2); }
+
+    .rank-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .rank-row {
+      display: grid;
+      grid-template-columns: 72px 1fr 52px;
+      gap: 10px;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .track {
+      height: 10px;
+      border-radius: 999px;
+      background: #edf0e8;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--green);
+    }
+
+    .fill.warn { background: var(--amber); }
+    .fill.bad { background: var(--red); }
+
+    .notes {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .note-title {
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .note-body {
+      color: var(--muted);
+      margin: 0;
+      font-size: 14px;
+    }
+
+    footer {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 clamp(18px, 4vw, 44px) 28px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 980px) {
+      .kpis, .layout, .two-col, .notes {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .decision {
+        grid-template-columns: 1fr;
+      }
+
+      .score-ring {
+        width: 104px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div>
+        <h1>封測資金輪動儀表板</h1>
+        <p class="subtitle">主分析：2026/6/10 至 2026/7/8，共 20 個交易日｜輔助觀察：近 5 日與近 60 日｜代表股：日月光投控、京元電、矽格、力成、頎邦</p>
+      </div>
+      <div class="badge">20日 Rotation Score：65 / 100｜轉強但未確認</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="grid kpis" aria-label="資金總覽">
+      <div class="card">
+        <div class="kpi-label">20日總成交金額</div>
+        <div class="kpi-value">10,589 億</div>
+        <div class="kpi-note">5 檔封測代表股合計</div>
+      </div>
+      <div class="card">
+        <div class="kpi-label">20日三大法人</div>
+        <div class="kpi-value positive">+16,816 張</div>
+        <div class="kpi-note">中段資金仍偏流入</div>
+      </div>
+      <div class="card">
+        <div class="kpi-label">近5日 Rotation Score</div>
+        <div class="kpi-value negative">25</div>
+        <div class="kpi-note">短線退潮，需等止穩</div>
+      </div>
+      <div class="card">
+        <div class="kpi-label">20日攻擊核心</div>
+        <div class="kpi-value">京元電 / 矽格</div>
+        <div class="kpi-note">京元電法人最強，矽格股價最強</div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-bottom:16px">
+      <h2>三週期資金節奏</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>週期</th>
+              <th>日期區間</th>
+              <th>Rotation Score</th>
+              <th>成交金額</th>
+              <th>三大法人</th>
+              <th>平均股價表現</th>
+              <th>判讀</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>5日短線</td>
+              <td>7/2-7/8</td>
+              <td class="negative">25</td>
+              <td>2,510 億</td>
+              <td class="negative">-23,542 張</td>
+              <td class="negative">-7.8%</td>
+              <td><span class="pill bad">短線退潮</span></td>
+            </tr>
+            <tr>
+              <td>20日主分析</td>
+              <td>6/10-7/8</td>
+              <td class="positive">65</td>
+              <td>10,589 億</td>
+              <td class="positive">+16,816 張</td>
+              <td class="positive">+8.3%</td>
+              <td><span class="pill watch">轉強觀察</span></td>
+            </tr>
+            <tr>
+              <td>60日背景</td>
+              <td>4/14-7/8</td>
+              <td class="warning">50</td>
+              <td>29,729 億</td>
+              <td class="negative">-178,144 張</td>
+              <td class="positive">+41.2%</td>
+              <td><span class="pill watch">股價強、法人未回補</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="grid layout">
+      <div class="card">
+        <h2>主結論</h2>
+        <div class="decision">
+            <div class="score-ring" aria-label="Rotation Score 65"><strong>65</strong></div>
+          <div>
+            <div class="decision-title">20日看得到輪動，5日顯示短線降溫</div>
+            <p class="decision-text">把時間拉長後，封測不是完全沒資金，而是 6/18 到 7/1 這段有明顯推升；但 7/2 到 7/8 的短線分數掉到 25，代表近期不是追價點，應等族群重新放量與法人轉買。</p>
+          </div>
+        </div>
+        <div class="signal-list">
+          <div class="signal"><span>成交量條件</span><span class="positive">20日維持高檔，5日開始縮</span></div>
+          <div class="signal"><span>領頭羊條件</span><span class="positive">京元電法人最強，矽格股價最強</span></div>
+          <div class="signal"><span>上漲家數條件</span><span class="warning">20日 4/5 上漲，5日明顯轉弱</span></div>
+          <div class="signal"><span>法人同步條件</span><span class="warning">20日買超，近5日賣超</span></div>
+          <div class="signal"><span>成交比重條件</span><span class="warning">下一版可加入 AI Server、PCB 做相對輪動</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>個股資金強度排名</h2>
+        <div class="rank-list">
+          <div class="rank-row">
+            <strong>矽格</strong>
+            <div class="track"><div class="fill" style="width: 86%"></div></div>
+            <span>86</span>
+          </div>
+          <div class="rank-row">
+            <strong>京元電</strong>
+            <div class="track"><div class="fill" style="width: 84%"></div></div>
+            <span>84</span>
+          </div>
+          <div class="rank-row">
+            <strong>日月光</strong>
+            <div class="track"><div class="fill warn" style="width: 70%"></div></div>
+            <span>70</span>
+          </div>
+          <div class="rank-row">
+            <strong>力成</strong>
+            <div class="track"><div class="fill warn" style="width: 55%"></div></div>
+            <span>55</span>
+          </div>
+          <div class="rank-row">
+            <strong>頎邦</strong>
+            <div class="track"><div class="fill bad" style="width: 25%"></div></div>
+            <span>25</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid two-col">
+      <div class="card">
+        <h2>20日每日成交金額趨勢</h2>
+        <svg class="chart" viewBox="0 0 640 260" role="img" aria-label="20日每日成交金額趨勢圖">
+          <line x1="48" y1="218" x2="612" y2="218" stroke="#dfe4d8"/>
+          <line x1="48" y1="38" x2="48" y2="218" stroke="#dfe4d8"/>
+          <polyline class="line-amount" points="48,186 78,201 107,123 137,168 167,187 196,209 226,95 256,55 285,38 315,140 345,140 375,98 404,218 434,163 464,148 493,179 523,151 553,110 582,138 612,199"/>
+          <g fill="#0f9f9a">
+            <circle cx="48" cy="186" r="4"/><circle cx="107" cy="123" r="4"/><circle cx="196" cy="209" r="4"/>
+            <circle cx="256" cy="55" r="4"/><circle cx="285" cy="38" r="4"/><circle cx="404" cy="218" r="4"/>
+            <circle cx="464" cy="148" r="4"/><circle cx="553" cy="110" r="4"/><circle cx="612" cy="199" r="4"/>
+          </g>
+          <g class="axis-label">
+            <text x="38" y="232">6/10</text><text x="180" y="232">6/17</text><text x="266" y="232">6/23</text>
+            <text x="390" y="232">6/29</text><text x="486" y="232">7/2</text><text x="602" y="232">7/8</text>
+            <text x="292" y="38">899億</text><text x="232" y="56">841億</text><text x="512" y="105">655億</text><text x="524" y="198">355億</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="card">
+        <h2>三週期 Rotation Score</h2>
+        <svg class="chart" viewBox="0 0 640 260" role="img" aria-label="三週期 Rotation Score 長條圖">
+          <line x1="44" y1="218" x2="612" y2="218" stroke="#bfc8bd"/>
+          <g>
+            <rect class="bar-negative" x="106" y="173" width="88" height="45" rx="6"/>
+            <rect class="bar-positive" x="276" y="101" width="88" height="117" rx="6"/>
+            <rect fill="#c8841f" x="446" y="128" width="88" height="90" rx="6"/>
+          </g>
+          <g class="axis-label">
+            <text x="117" y="238">5日</text><text x="284" y="238">20日</text><text x="454" y="238">60日</text>
+            <text x="123" y="166">25</text><text x="292" y="94">65</text><text x="462" y="121">50</text>
+            <text x="84" y="154">短線退潮</text><text x="248" y="82">主分析轉強</text><text x="414" y="108">背景中性</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:16px">
+      <h2>代表股明細</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>代號</th>
+              <th>股票</th>
+              <th>20日成交金額</th>
+              <th>6/10 收盤</th>
+              <th>7/8 收盤</th>
+              <th>20日股價變化</th>
+              <th>三大法人</th>
+              <th>外資</th>
+              <th>投信</th>
+              <th>狀態</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>3711</td><td>日月光投控</td><td>3,538 億</td><td>538.8</td><td>625.0</td><td class="positive">+16.0%</td><td class="positive">+5,460 張</td><td class="positive">+45,224 張</td><td class="negative">-41,727 張</td><td><span class="pill watch">風向球</span></td>
+            </tr>
+            <tr>
+              <td>2449</td><td>京元電</td><td>2,360 億</td><td>272.0</td><td>305.5</td><td class="positive">+12.3%</td><td class="positive">+60,381 張</td><td class="positive">+77,978 張</td><td class="negative">-19,830 張</td><td><span class="pill good">法人最強</span></td>
+            </tr>
+            <tr>
+              <td>6257</td><td>矽格</td><td>570 億</td><td>203.5</td><td>244.5</td><td class="positive">+20.1%</td><td class="positive">+15,064 張</td><td class="positive">+13,941 張</td><td class="positive">+281 張</td><td><span class="pill good">股價最強</span></td>
+            </tr>
+            <tr>
+              <td>6239</td><td>力成</td><td>2,571 億</td><td>303.0</td><td>318.0</td><td class="positive">+5.0%</td><td class="negative">-32,146 張</td><td class="negative">-7,525 張</td><td class="negative">-20,575 張</td><td><span class="pill watch">量增但法人賣</span></td>
+            </tr>
+            <tr>
+              <td>6147</td><td>頎邦</td><td>1,549 億</td><td>226.0</td><td>199.5</td><td class="negative">-11.7%</td><td class="negative">-31,943 張</td><td class="negative">-1,452 張</td><td class="negative">-26,941 張</td><td><span class="pill bad">落後</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="notes">
+      <div class="card">
+        <div class="note-title">下一個轉強訊號</div>
+        <p class="note-body">若 5 檔單日成交金額重新站回 600 億以上，且近 5 日三大法人由賣轉買，Rotation Score 才有機會升到 70 以上。</p>
+      </div>
+      <div class="card">
+        <div class="note-title">最乾淨的觀察標的</div>
+        <p class="note-body">京元電是 20 日法人買超最強，矽格是 20 日股價表現最強。兩者若同步轉強，封測輪動可信度會提高。</p>
+      </div>
+      <div class="card">
+        <div class="note-title">風險提醒</div>
+        <p class="note-body">日月光是封測權值風向球，但投信賣壓仍重。若日月光不能止穩，封測很難變成全面主流。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    資料來源：台灣證交所、櫃買中心公開行情與三大法人買賣超資料。此儀表板為研究整理，不構成投資建議。
+  </footer>
+</body>
+</html>
