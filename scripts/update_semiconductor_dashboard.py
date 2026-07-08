@@ -26,13 +26,13 @@ def fetch(url):
     request = Request(url, headers={"User-Agent": "Mozilla/5.0"})
     context = ssl._create_unverified_context()
     last_error = None
-    for attempt in range(4):
+    for attempt in range(3):
         try:
-            with urlopen(request, timeout=60, context=context) as res:
+            with urlopen(request, timeout=25, context=context) as res:
                 return json.loads(res.read().decode("utf-8"))
         except Exception as exc:
             last_error = exc
-            time.sleep(2 + attempt * 3)
+            time.sleep(2 + attempt * 2)
     raise last_error
 
 
@@ -440,7 +440,10 @@ def main():
         raise RuntimeError(f"Not enough common trading dates: {len(common_dates)}")
     all_dates = common_dates[-60:]
     latest_date = all_dates[-1]
-    institutions = read_institutions(all_dates)
+    # The dashboard's decisive institutional signals are 5D and 20D.
+    # Keeping institutional fetches to the recent window makes scheduled runs
+    # much more reliable when exchange endpoints are slow.
+    institutions = read_institutions(all_dates[-25:])
     summaries = {days: score_for(prices, institutions, all_dates, days) for days in (5, 20, 60)}
     window20 = all_dates[-20:]
     stock_metrics = {stock: stock_window(prices, institutions, stock, window20) for stock in STOCKS}
