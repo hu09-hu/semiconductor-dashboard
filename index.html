@@ -27,7 +27,7 @@
     h2 { margin:0 0 12px; font-size:19px; }
     .positive { color:var(--green); } .negative { color:var(--red); } .warning { color:var(--amber); }
     .decision { display:grid; grid-template-columns:116px 1fr; gap:14px; align-items:center; }
-    .score-ring { width:116px; aspect-ratio:1; border-radius:50%; background:conic-gradient(var(--amber) 0 43%, #eceee6 43% 100%); display:grid; place-items:center; position:relative; }
+    .score-ring { width:116px; aspect-ratio:1; border-radius:50%; background:conic-gradient(var(--amber) 0 45%, #eceee6 45% 100%); display:grid; place-items:center; position:relative; }
     .score-ring::after { content:""; position:absolute; inset:12px; background:var(--panel); border-radius:50%; }
     .score-ring strong { position:relative; z-index:1; font-size:28px; }
     .decision-title { font-size:22px; font-weight:800; margin-bottom:6px; }
@@ -52,43 +52,43 @@
   </style>
 </head>
 <body>
-  <header><div class="topbar"><div><h1>封測資金輪動儀表板</h1><p class="subtitle">更新日：2026/09/15｜主分析：8/19 至 9/15，共 20 個交易日｜輔助觀察：近 5 日與近 60 日</p></div><div class="badge">20日 Rotation Score：43 / 100｜偏弱</div></div></header>
+  <header><div class="topbar"><div><h1>封測資金輪動儀表板</h1><p class="subtitle">更新日：2026/09/16｜主分析：8/20 至 9/16，共 20 個交易日｜輔助觀察：近 5 日與近 60 日</p></div><div class="badge">20日 Rotation Score：45 / 100｜偏弱</div></div></header>
   <main>
     <section class="grid kpis">
-      <div class="card"><div class="kpi-label">20日總成交金額</div><div class="kpi-value">5,621 億</div><div class="kpi-note">5 檔封測代表股合計</div></div>
-      <div class="card"><div class="kpi-label">20日三大法人</div><div class="kpi-value negative">-17,080 張</div><div class="kpi-note">中段資金方向</div></div>
-      <div class="card"><div class="kpi-label">近5日 Rotation Score</div><div class="kpi-value warning">56</div><div class="kpi-note">短線加速或退潮</div></div>
-      <div class="card"><div class="kpi-label">20日攻擊核心</div><div class="kpi-value">頎邦</div><div class="kpi-note">資金強度排名第一</div></div>
+      <div class="card"><div class="kpi-label">20日總成交金額</div><div class="kpi-value">5,624 億</div><div class="kpi-note">5 檔封測代表股合計</div></div>
+      <div class="card"><div class="kpi-label">20日三大法人</div><div class="kpi-value negative">-14,634 張</div><div class="kpi-note">中段資金方向</div></div>
+      <div class="card"><div class="kpi-label">近5日 Rotation Score</div><div class="kpi-value negative">43</div><div class="kpi-note">短線加速或退潮</div></div>
+      <div class="card"><div class="kpi-label">20日攻擊核心</div><div class="kpi-value">日月光投控</div><div class="kpi-note">資金強度排名第一</div></div>
     </section>
     <section class="card" style="margin-bottom:16px"><h2>三週期資金節奏</h2><div class="table-wrap"><table><thead><tr><th>週期</th><th>日期區間</th><th>Rotation Score</th><th>成交金額</th><th>三大法人</th><th>平均股價表現</th><th>判讀</th></tr></thead><tbody>
-      <tr><td>5日短線</td><td>9/9-9/15</td><td>56</td><td>1,397 億</td><td class="positive">+32,060 張</td><td class="negative">-3.7%</td><td><span class="pill watch">觀察</span></td></tr>
-      <tr><td>20日主分析</td><td>8/19-9/15</td><td>43</td><td>5,621 億</td><td class="negative">-17,080 張</td><td class="positive">+8.0%</td><td><span class="pill bad">偏弱</span></td></tr>
-      <tr><td>60日背景</td><td>6/23-9/15</td><td>20</td><td>21,006 億</td><td class="negative">-50,425 張</td><td class="negative">-17.9%</td><td><span class="pill watch">背景趨勢</span></td></tr>
+      <tr><td>5日短線</td><td>9/10-9/16</td><td>43</td><td>1,308 億</td><td class="positive">+870 張</td><td class="negative">-1.6%</td><td><span class="pill bad">退潮</span></td></tr>
+      <tr><td>20日主分析</td><td>8/20-9/16</td><td>45</td><td>5,624 億</td><td class="negative">-14,634 張</td><td class="positive">+9.6%</td><td><span class="pill bad">偏弱</span></td></tr>
+      <tr><td>60日背景</td><td>6/24-9/16</td><td>21</td><td>20,342 億</td><td class="negative">-48,442 張</td><td class="negative">-15.6%</td><td><span class="pill watch">背景趨勢</span></td></tr>
     </tbody></table></div></section>
     <section class="grid layout">
-      <div class="card"><h2>主結論</h2><div class="decision"><div class="score-ring"><strong>43</strong></div><div><div class="decision-title">20日看主流，5日看加速</div><p class="decision-text">若近 5 日分數升破 70、20 日分數續升，且日月光止穩，封測輪動可信度會提高；若近 5 日分數低於 45，代表短線仍在退潮。</p></div></div><div class="signal-list">
-        <div class="signal"><span>成交量條件</span><span class="warning">5日均量較前期 -7.9%</span></div>
-        <div class="signal"><span>法人同步條件</span><span class="positive">近5日 +32,060 張</span></div>
+      <div class="card"><h2>主結論</h2><div class="decision"><div class="score-ring"><strong>45</strong></div><div><div class="decision-title">20日看主流，5日看加速</div><p class="decision-text">若近 5 日分數升破 70、20 日分數續升，且日月光止穩，封測輪動可信度會提高；若近 5 日分數低於 45，代表短線仍在退潮。</p></div></div><div class="signal-list">
+        <div class="signal"><span>成交量條件</span><span class="warning">5日均量較前期 -16.4%</span></div>
+        <div class="signal"><span>法人同步條件</span><span class="positive">近5日 +870 張</span></div>
         <div class="signal"><span>上漲家數條件</span><span class="warning">20日 5/5 上漲</span></div>
         <div class="signal"><span>成交比重條件</span><span class="warning">可再加入 AI Server、PCB 做相對輪動</span></div>
       </div></div>
       <div class="card"><h2>個股資金強度排名</h2><div class="rank-list">
           <div class="rank-row">
-            <strong>頎邦</strong>
+            <strong>日月光投控</strong>
             <div class="track"><div class="fill " style="width: 85%"></div></div>
             <span>85</span>
           </div>
 
           <div class="rank-row">
-            <strong>日月光投控</strong>
-            <div class="track"><div class="fill " style="width: 79%"></div></div>
-            <span>79</span>
+            <strong>頎邦</strong>
+            <div class="track"><div class="fill " style="width: 78%"></div></div>
+            <span>78</span>
           </div>
 
           <div class="rank-row">
             <strong>京元電</strong>
-            <div class="track"><div class="fill bad" style="width: 43%"></div></div>
-            <span>43</span>
+            <div class="track"><div class="fill bad" style="width: 39%"></div></div>
+            <span>39</span>
           </div>
 
           <div class="rank-row">
@@ -104,10 +104,20 @@
           </div></div></div>
     </section>
     <section class="grid two-col">
-      <div class="card"><h2>20日每日成交金額趨勢</h2><svg class="chart" viewBox="0 0 640 260"><line x1="48" y1="218" x2="612" y2="218" stroke="#dfe4d8"/><line x1="48" y1="38" x2="48" y2="218" stroke="#dfe4d8"/><polyline class="line-amount" points="48,164 78,177 107,209 137,218 167,200 196,176 226,110 256,38 285,77 315,60 345,140 375,124 404,131 434,93 464,139 493,115 523,106 553,140 582,186 612,145"/><g fill="#0f9f9a"><circle cx="48" cy="164" r="4"/><circle cx="137" cy="218" r="4"/><circle cx="226" cy="110" r="4"/><circle cx="315" cy="60" r="4"/><circle cx="404" cy="131" r="4"/><circle cx="493" cy="115" r="4"/><circle cx="582" cy="186" r="4"/></g><g class="axis-label"><text x="38" y="232">8/19</text><text x="300" y="232">9/2</text><text x="590" y="232">9/15</text><text x="520" y="52">高點 468 億</text><text x="510" y="190">最新 266 億</text></g></svg></div>
-      <div class="card"><h2>三週期 Rotation Score</h2><svg class="chart" viewBox="0 0 640 260"><line x1="44" y1="218" x2="612" y2="218" stroke="#bfc8bd"/><g><rect class="bar-negative" x="106" y="117" width="88" height="101" rx="6"/><rect class="bar-positive" x="276" y="141" width="88" height="77" rx="6"/><rect class="bar-amber" x="446" y="182" width="88" height="36" rx="6"/></g><g class="axis-label"><text x="118" y="238">5日</text><text x="128" y="109">56</text><text x="288" y="238">20日</text><text x="298" y="133">43</text><text x="458" y="238">60日</text><text x="468" y="174">20</text></g></svg></div>
+      <div class="card"><h2>20日每日成交金額趨勢</h2><svg class="chart" viewBox="0 0 640 260"><line x1="48" y1="218" x2="612" y2="218" stroke="#dfe4d8"/><line x1="48" y1="38" x2="48" y2="218" stroke="#dfe4d8"/><polyline class="line-amount" points="48,177 78,209 107,218 137,200 167,176 196,110 226,38 256,77 285,60 315,140 345,124 375,131 404,93 434,139 464,115 493,106 523,140 553,186 582,145 612,162"/><g fill="#0f9f9a"><circle cx="48" cy="177" r="4"/><circle cx="137" cy="200" r="4"/><circle cx="226" cy="38" r="4"/><circle cx="315" cy="140" r="4"/><circle cx="404" cy="93" r="4"/><circle cx="493" cy="106" r="4"/><circle cx="582" cy="145" r="4"/></g><g class="axis-label"><text x="38" y="232">8/20</text><text x="300" y="232">9/3</text><text x="590" y="232">9/16</text><text x="520" y="52">高點 468 億</text><text x="510" y="190">最新 235 億</text></g></svg></div>
+      <div class="card"><h2>三週期 Rotation Score</h2><svg class="chart" viewBox="0 0 640 260"><line x1="44" y1="218" x2="612" y2="218" stroke="#bfc8bd"/><g><rect class="bar-negative" x="106" y="141" width="88" height="77" rx="6"/><rect class="bar-positive" x="276" y="137" width="88" height="81" rx="6"/><rect class="bar-amber" x="446" y="180" width="88" height="38" rx="6"/></g><g class="axis-label"><text x="118" y="238">5日</text><text x="128" y="133">43</text><text x="288" y="238">20日</text><text x="298" y="129">45</text><text x="458" y="238">60日</text><text x="468" y="172">21</text></g></svg></div>
     </section>
     <section class="card" style="margin-top:16px"><h2>每日五檔成交金額</h2><div class="table-wrap"><table><thead><tr><th>日期</th><th>日月光</th><th>京元電</th><th>矽格</th><th>力成</th><th>頎邦</th><th>五檔合計</th><th>當日最大</th></tr></thead><tbody>
+            <tr>
+              <td>9/16</td>
+              <td>57</td>
+              <td>20</td>
+              <td>7</td>
+              <td>19</td>
+              <td>132</td>
+              <td>235 億</td>
+              <td><span class="pill watch">頎邦</span></td>
+            </tr>
             <tr>
               <td>9/15</td>
               <td>89</td>
@@ -297,61 +307,51 @@
               <td>24</td>
               <td>206 億</td>
               <td><span class="pill watch">日月光投控</span></td>
-            </tr>
-            <tr>
-              <td>8/19</td>
-              <td>131</td>
-              <td>36</td>
-              <td>11</td>
-              <td>26</td>
-              <td>28</td>
-              <td>231 億</td>
-              <td><span class="pill watch">日月光投控</span></td>
             </tr></tbody></table></div><p class="kpi-note">單位：億元。日期由新到舊排列，用來觀察每日資金集中在哪一家公司。</p></section>
     <section class="card" style="margin-top:16px"><h2>代表股明細</h2><div class="table-wrap"><table><thead><tr><th>代號</th><th>股票</th><th>20日成交金額</th><th>期初收盤</th><th>最新收盤</th><th>20日股價變化</th><th>三大法人</th><th>外資</th><th>投信</th><th>狀態</th></tr></thead><tbody>
             <tr>
-              <td>3711</td><td>日月光投控</td><td>2,116 億</td>
-              <td>588.0</td><td>592.0</td>
-              <td class="positive">+0.7%</td>
-              <td class="positive">+8,312 張</td>
-              <td class="positive">+25,735 張</td>
-              <td class="negative">-18,458 張</td>
+              <td>3711</td><td>日月光投控</td><td>2,042 億</td>
+              <td>590.0</td><td>605.0</td>
+              <td class="positive">+2.5%</td>
+              <td class="positive">+11,104 張</td>
+              <td class="positive">+26,017 張</td>
+              <td class="negative">-16,172 張</td>
               <td><span class="pill watch">風向球</span></td>
             </tr>
             <tr>
-              <td>2449</td><td>京元電</td><td>1,085 億</td>
-              <td>235.0</td><td>257.0</td>
-              <td class="positive">+9.4%</td>
-              <td class="negative">-7,858 張</td>
-              <td class="negative">-15,867 張</td>
-              <td class="positive">+8,271 張</td>
+              <td>2449</td><td>京元電</td><td>1,069 億</td>
+              <td>235.0</td><td>261.5</td>
+              <td class="positive">+11.3%</td>
+              <td class="negative">-8,416 張</td>
+              <td class="negative">-16,715 張</td>
+              <td class="positive">+8,101 張</td>
               <td><span class="pill watch">觀察</span></td>
             </tr>
             <tr>
-              <td>6257</td><td>矽格</td><td>314 億</td>
-              <td>199.5</td><td>207.5</td>
-              <td class="positive">+4.0%</td>
-              <td class="negative">-16,125 張</td>
-              <td class="negative">-12,451 張</td>
-              <td class="negative">-3,700 張</td>
+              <td>6257</td><td>矽格</td><td>310 億</td>
+              <td>199.5</td><td>210.0</td>
+              <td class="positive">+5.3%</td>
+              <td class="negative">-14,502 張</td>
+              <td class="negative">-11,913 張</td>
+              <td class="negative">-2,760 張</td>
               <td><span class="pill watch">觀察</span></td>
             </tr>
             <tr>
-              <td>6239</td><td>力成</td><td>685 億</td>
-              <td>262.5</td><td>268.0</td>
-              <td class="positive">+2.1%</td>
-              <td class="negative">-12,308 張</td>
-              <td class="negative">-7,993 張</td>
-              <td class="negative">-3,822 張</td>
+              <td>6239</td><td>力成</td><td>678 億</td>
+              <td>268.5</td><td>274.5</td>
+              <td class="positive">+2.2%</td>
+              <td class="negative">-10,879 張</td>
+              <td class="negative">-8,465 張</td>
+              <td class="negative">-2,289 張</td>
               <td><span class="pill watch">觀察</span></td>
             </tr>
             <tr>
-              <td>6147</td><td>頎邦</td><td>1,421 億</td>
-              <td>161.5</td><td>200.0</td>
-              <td class="positive">+23.8%</td>
-              <td class="positive">+10,899 張</td>
-              <td class="positive">+85 張</td>
-              <td class="positive">+8,104 張</td>
+              <td>6147</td><td>頎邦</td><td>1,525 億</td>
+              <td>163.5</td><td>207.5</td>
+              <td class="positive">+26.9%</td>
+              <td class="positive">+8,059 張</td>
+              <td class="negative">-5,497 張</td>
+              <td class="positive">+10,496 張</td>
               <td><span class="pill good">轉強</span></td>
             </tr></tbody></table></div></section>
     <section class="grid notes">
